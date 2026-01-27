@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { transformProduct } from "@/lib/db-helpers";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     if (!prisma) {
       return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     }
 
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { category: { select: { slug: true } }, subcategory: { select: { slug: true } } },
     });
 
