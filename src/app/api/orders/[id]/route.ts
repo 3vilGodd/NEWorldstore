@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
 type OrderRouteContext = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export async function GET(_request: Request, context: OrderRouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   // Stub order tracker response
   const status = "IN_TRANSIT";
