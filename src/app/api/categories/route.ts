@@ -16,7 +16,7 @@ export async function GET() {
       orderBy: { name: "asc" },
     });
 
-    const formatted = categories.map((cat) => ({
+    const formatted = categories.map((cat: typeof categories[number]) => ({
       name: cat.name,
       slug: cat.slug,
       accent: cat.accent,
