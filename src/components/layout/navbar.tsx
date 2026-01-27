@@ -86,15 +86,23 @@ export function Navbar() {
 }
 
 function IconButton({ icon, label, href }: { icon: React.ReactNode; label: string; href?: string }) {
-  const Component = href ? Link : "button";
-  const props = href ? { href } : { "aria-label": label };
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-sm hover:border-white/30"
+      >
+        {icon}
+      </Link>
+    );
+  }
   return (
-    <Component
-      {...props}
+    <button
+      aria-label={label}
       className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-sm hover:border-white/30"
     >
       {icon}
-    </Component>
+    </button>
   );
 }
 

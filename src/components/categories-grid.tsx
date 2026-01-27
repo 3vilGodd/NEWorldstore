@@ -17,7 +17,7 @@ const circleMotion = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { delay: 0.06 * i, duration: 0.4, ease: "easeOut" },
+    transition: { delay: 0.06 * i, duration: 0.4, ease: "easeOut" as const },
   }),
 };
 

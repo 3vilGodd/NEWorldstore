@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 
 export default function AdminOrdersPage() {
   // Mock orders - in production, fetch from API
-  const orders = [];
+  const orders: any[] = [];
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-14">

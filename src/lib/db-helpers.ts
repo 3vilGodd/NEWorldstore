@@ -1,5 +1,5 @@
 import { Product as PrismaProduct } from "@prisma/client";
-import { Product } from "./types";
+import { Product, Badge } from "./types";
 
 export function transformProduct(p: PrismaProduct & { category: { slug: string }; subcategory: { slug: string } }): Product {
   return {
@@ -16,7 +16,7 @@ export function transformProduct(p: PrismaProduct & { category: { slug: string }
     compatibility: p.compatibility,
     images: p.images,
     thumbnail: p.thumbnail,
-    badges: (p.badges as string[]) ?? [],
+    badges: (p.badges as Badge[]) ?? [],
     features: p.features ?? [],
     offers: p.offers ?? [],
     tags: p.tags ?? [],

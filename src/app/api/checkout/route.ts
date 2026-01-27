@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: payload.amount * 100,
       currency: payload.currency,
-      metadata: { receipt: payload.receipt },
+      metadata: { receipt: payload.receipt || "N/A" },
     });
 
     return NextResponse.json({ id: paymentIntent.id, clientSecret: paymentIntent.client_secret, provider: "stripe" });
