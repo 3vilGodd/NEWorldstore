@@ -1,8 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #06070a;
+  --foreground: #e8edf7;
+  --muted: #a0abc0;
+  --accent: #64d6ff;
+  --accent-2: #9c6bff;
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] {
+  --background: #06070a;
+  --foreground: #e8edf7;
+  --muted: #a0abc0;
+  --accent: #64d6ff;
+  --accent-2: #9c6bff;
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] {
+  --background: #f5f7fb;
+  --foreground: #0c1224;
+  --muted: #475069;
+  --accent: #2f80ff;
+  --accent-2: #a855f7;
+  --card: rgba(255, 255, 255, 0.75);
+  --border: rgba(12, 18, 36, 0.06);
+  --shadow: 0 15px 60px rgba(10, 22, 50, 0.1);
 }
 
 @theme inline {
@@ -12,15 +40,67 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at 20% 20%, rgba(100, 214, 255, 0.06), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(156, 107, 255, 0.06), transparent 30%),
+    radial-gradient(circle at 50% 50%, rgba(47, 128, 255, 0.05), transparent 38%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+.glass-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glow-ring {
+  position: relative;
+}
+
+.glow-ring::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.parallax {
+  background-attachment: fixed;
+}
+
+.shadow-strong {
+  box-shadow: var(--shadow);
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #0b1224;
+}
+
+.btn-secondary {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
 }

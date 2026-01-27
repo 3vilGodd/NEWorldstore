@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEWorld eStore — Production-ready mobile protection marketplace
 
-## Getting Started
+Modern eCommerce built with **Next.js 14 App Router**, **TypeScript**, **Tailwind 4**, **Prisma + PostgreSQL**, **NextAuth (Email + Google)**, and **Razorpay + Stripe** checkout hooks.
 
-First, run the development server:
+## Quick start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# visit http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/neworld_estore"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-change-in-production"
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+EMAIL_SERVER="smtp://user:pass@mailtrap.io:2525"
+EMAIL_FROM="login@neworld.store"
+RAZORPAY_KEY_ID=""
+RAZORPAY_KEY_SECRET=""
+STRIPE_SECRET_KEY=""
+```
 
-## Learn More
+## Database & seed
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run db:generate   # prisma client
+npm run db:migrate    # create tables
+npm run db:seed       # load starter catalog/categories
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` – local dev server
+- `npm run build && npm start` – production build/serve
+- `npm run lint` / `npm run lint:fix` – linting
+- `npm run db:*` – Prisma helpers
 
-## Deploy on Vercel
+## Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Customer Features
+- ✅ Full-screen cinematic hero (video, parallax, Framer Motion, glassmorphism)
+- ✅ Dynamic category routes with circular "shop by" grid
+- ✅ Product detail pages with gallery, compatibility chips, offers, pricing badges
+- ✅ **Shopping Cart** - Add/remove items, update quantities, view totals
+- ✅ **Wishlist** - Save favorite products for later
+- ✅ **Checkout Flow** - Address form, payment method selection (Razorpay/Stripe)
+- ✅ **User Authentication** - Email & Google OAuth sign-in
+- ✅ **User Profile** - Orders history, addresses management
+- ✅ **Order Tracking** - Real-time order status and timeline
+- ✅ Search with URL params, autocomplete suggestions
+- ✅ Responsive, mobile-first design
+- ✅ Dark/light theme toggle
+- ✅ Micro-interactions and smooth animations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Admin Features
+- ✅ **Products Management** - View, edit, delete products
+- ✅ **Categories Management** - Manage categories and subcategories
+- ✅ **Orders Dashboard** - Track and manage customer orders
+- ✅ **Inventory Management** - Stock monitoring, low stock alerts
+- ✅ **Coupons Management** - Create and manage promotional codes
+
+### Technical
+- ✅ API routes: Cart, Wishlist, Checkout (Razorpay/Stripe), Orders, Products, NextAuth
+- ✅ Prisma schema: Users, Products, Orders, Cart, Wishlist, Addresses, Coupons
+- ✅ Database integration ready (replace mock data with Prisma queries)
+- ✅ Session management with NextAuth
+- ✅ Type-safe with TypeScript
+
+## Deployment
+
+- Ready for Vercel (Next/Image remote patterns set for Unsplash/avatars/coverr)
+- Payments keys pulled from environment; configure allowed webhook URLs per provider
+- Update `metadata` in `src/app/layout.tsx` if domain changes

@@ -1,0 +1,10 @@
+# Netlify configuration for Next.js App Router project
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# The Next.js adapter is automatically applied by Netlify for Next.js projects.
+# Environment variables (like database URLs, NEXTAUTH_SECRET, etc.)
+# should be configured in the Netlify UI (Site settings → Environment variables).
+
