@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/ensure-user";
 import { z } from "zod";
 
 const addItemSchema = z.object({
@@ -49,16 +50,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await ensureUser(session);
+    if (!user) {
+      return NextResponse.json({ error: "Unable to resolve user" }, { status: 500 });
+    }
+
     const json = await req.json();
     const { productId, quantity } = addItemSchema.parse(json);
 
     let cart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId: session.user.id },
+        data: { userId: user.id },
       });
     }
 

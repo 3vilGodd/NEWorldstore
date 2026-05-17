@@ -84,6 +84,7 @@ export default function CheckoutPage() {
           currency: "INR",
           provider: paymentMethod,
           receipt: `ORDER-${Date.now()}`,
+          address,
         }),
       });
 
@@ -93,9 +94,12 @@ export default function CheckoutPage() {
         return;
       }
 
-      // In production, redirect to payment gateway
-      alert(`Payment initiated with ${paymentMethod}. Order ID: ${data.id}`);
-      router.push(`/orders/${data.id}`);
+      const orderId = data.orderId ?? data.id;
+      const message = data.paymentSkipped
+        ? data.message
+        : `Payment initiated with ${paymentMethod}. Order ID: ${orderId}`;
+      alert(message);
+      router.push(`/orders/${orderId}`);
     } catch (error) {
       console.error("Payment error", error);
       alert("Payment failed. Please try again.");

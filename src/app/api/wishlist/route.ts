@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/ensure-user";
 import { z } from "zod";
 
 const addItemSchema = z.object({
@@ -48,16 +49,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await ensureUser(session);
+    if (!user) {
+      return NextResponse.json({ error: "Unable to resolve user" }, { status: 500 });
+    }
+
     const json = await req.json();
     const { productId } = addItemSchema.parse(json);
 
     let wishlist = await prisma.wishlist.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     if (!wishlist) {
       wishlist = await prisma.wishlist.create({
-        data: { userId: session.user.id },
+        data: { userId: user.id },
       });
     }
 
@@ -107,9 +113,28 @@ export async function DELETE(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const itemId = searchParams.get("itemId");
+    let productId = searchParams.get("productId");
+
+    if (!productId) {
+      try {
+        const json = await req.json();
+        productId = json?.productId ?? null;
+      } catch {
+        // no body
+      }
+    }
 
     if (itemId) {
       await prisma.wishlistItem.delete({ where: { id: itemId } });
+    } else if (productId) {
+      const wishlist = await prisma.wishlist.findUnique({
+        where: { userId: session.user.id },
+      });
+      if (wishlist) {
+        await prisma.wishlistItem.deleteMany({
+          where: { wishlistId: wishlist.id, productId },
+        });
+      }
     }
 
     return NextResponse.json({ success: true });

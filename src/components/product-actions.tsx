@@ -2,15 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
+
+async function parseApiError(res: Response) {
+  try {
+    const data = await res.json();
+    return data.error || data.message || `Request failed (${res.status})`;
+  } catch {
+    return `Request failed (${res.status})`;
+  }
+}
 
 export function ProductActions({ productId }: { productId: string }) {
   const [adding, setAdding] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleAddToCart = async () => {
     setAdding(true);
+    setError(null);
     try {
       const res = await fetch("/api/cart", {
         method: "POST",
@@ -19,9 +30,11 @@ export function ProductActions({ productId }: { productId: string }) {
       });
       if (res.ok) {
         router.push("/cart");
+      } else {
+        setError(await parseApiError(res));
       }
-    } catch (error) {
-      console.error("Failed to add to cart", error);
+    } catch {
+      setError("Could not add to cart. Please try again.");
     } finally {
       setAdding(false);
     }
@@ -29,6 +42,7 @@ export function ProductActions({ productId }: { productId: string }) {
 
   const handleBuyNow = async () => {
     setAdding(true);
+    setError(null);
     try {
       const res = await fetch("/api/cart", {
         method: "POST",
@@ -37,15 +51,18 @@ export function ProductActions({ productId }: { productId: string }) {
       });
       if (res.ok) {
         router.push("/checkout");
+      } else {
+        setError(await parseApiError(res));
       }
-    } catch (error) {
-      console.error("Failed to add to cart", error);
+    } catch {
+      setError("Could not add to cart. Please try again.");
     } finally {
       setAdding(false);
     }
   };
 
   const handleWishlist = async () => {
+    setError(null);
     try {
       const res = await fetch("/api/wishlist", {
         method: wishlisted ? "DELETE" : "POST",
@@ -54,14 +71,29 @@ export function ProductActions({ productId }: { productId: string }) {
       });
       if (res.ok) {
         setWishlisted(!wishlisted);
+      } else {
+        setError(await parseApiError(res));
       }
-    } catch (error) {
-      console.error("Failed to toggle wishlist", error);
+    } catch {
+      setError("Could not update wishlist. Please try again.");
     }
   };
 
   return (
     <div className="flex flex-wrap gap-3">
+      {error && (
+        <p className="w-full rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-200">
+          {error}
+          {error.includes("Unauthorized") && (
+            <span>
+              {" "}
+              <a href="/auth/signin" className="underline">
+                Sign in
+              </a>
+            </span>
+          )}
+        </p>
+      )}
       <button
         onClick={handleBuyNow}
         disabled={adding}

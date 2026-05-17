@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 type OrderRouteContext = {
   params: Promise<{
@@ -6,20 +7,56 @@ type OrderRouteContext = {
   }>;
 };
 
+function buildTimeline(status: string, createdAt: Date) {
+  const placed = createdAt.toISOString();
+  const packed = new Date(createdAt.getTime() + 3 * 60 * 60 * 1000).toISOString();
+  const shipped = new Date(createdAt.getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+  const steps = [
+    { label: "Order placed", at: placed, completed: true },
+    { label: "Packed", at: packed, completed: status !== "PLACED" },
+    { label: "Handed to courier", at: shipped, completed: ["IN_TRANSIT", "DELIVERED", "CONFIRMED"].includes(status) },
+    { label: "Delivered", at: shipped, completed: status === "DELIVERED" },
+  ];
+
+  return steps.filter((s) => s.completed || s.label === "Order placed");
+}
+
 export async function GET(_request: Request, context: OrderRouteContext) {
   const { id } = await context.params;
 
-  // Stub order tracker response
-  const status = "IN_TRANSIT";
-  const timeline = [
-    { label: "Order placed", at: "2024-12-10T09:00:00Z", completed: true },
-    { label: "Packed", at: "2024-12-10T12:00:00Z", completed: true },
-    { label: "Handed to courier", at: "2024-12-11T08:20:00Z", completed: true },
-  ];
+  if (prisma) {
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: { include: { product: { select: { name: true, thumbnail: true } } } },
+        address: true,
+      },
+    });
+
+    if (order) {
+      return NextResponse.json({
+        id: order.id,
+        status: order.status,
+        total: order.total,
+        currency: order.currency,
+        paymentId: order.paymentId,
+        paymentMode: order.paymentMode,
+        createdAt: order.createdAt.toISOString(),
+        timeline: buildTimeline(order.status, order.createdAt),
+        items: order.items.map((item) => ({
+          quantity: item.quantity,
+          price: item.price,
+          product: item.product,
+        })),
+        address: order.address,
+      });
+    }
+  }
 
   return NextResponse.json({
     id,
-    status,
-    timeline,
+    status: "IN_TRANSIT",
+    timeline: buildTimeline("IN_TRANSIT", new Date()),
   });
 }
